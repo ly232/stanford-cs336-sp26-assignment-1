@@ -597,6 +597,8 @@ def run_train_bpe(
     """
     with open(input_path, 'r') as f:
         text = f.read()
+        for sp in special_tokens:
+            text = text.replace(sp, '')
     pretokens = regex.findall(PAT, text)
     bpe = BytePairEncoder(pretokens, vocab_size, special_tokens)
     return bpe.train()
