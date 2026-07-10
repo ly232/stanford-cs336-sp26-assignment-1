@@ -7,10 +7,14 @@ from typing import IO, Any, BinaryIO
 import numpy.typing as npt
 import torch
 from jaxtyping import Bool, Float, Int
+import regex
 from torch import Tensor
 
 from cs336_basics.tokenizer.bpe import BytePairEncoder
 
+
+# From https://github.com/openai/gpt-2/blob/master/src/encoder.py#L53C31-L53C112
+PAT = r"""'s|'t|'re|'ve|'m|'ll|'d| ?\p{L}+| ?\p{N}+| ?[^\s\p{L}\p{N}]+|\s+(?!\S)|\s+"""
 
 def run_linear(
     d_in: int,
@@ -591,5 +595,8 @@ def run_train_bpe(
                 representing that <token1> was merged with <token2>.
                 Merges are ordered by order of creation.
     """
-    bpe = BytePairEncoder()
-    raise NotImplementedError
+    with open(input_path, 'r') as f:
+        text = f.read()
+    pretokens = regex.findall(PAT, text)
+    bpe = BytePairEncoder(pretokens, vocab_size, special_tokens)
+    return bpe.train()
