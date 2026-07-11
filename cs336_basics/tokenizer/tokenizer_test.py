@@ -5,7 +5,7 @@ uv run pytest cs336_basics/tokenizer/tokenizer_test.py
 
 from cs336_basics.tokenizer.tokenizer import Tokenizer
 
-def test_encode():
+def test_encode_ascii():
     tokenizer = Tokenizer(
         vocabs = {
             0: b' ',
@@ -28,14 +28,31 @@ def test_encode():
             (b' a', b't'),
         ],
     )
-    ids = tokenizer.encode('the cat ate')
-    print(ids)
-    assert ids == [9, 7, 1, 5, 10, 3]
+    expected_token_ids = [9, 7, 1, 5, 10, 3]
+    assert tokenizer.encode('the cat ate') == expected_token_ids
+    assert list(tokenizer.encode_iterable('the cat ate')) == expected_token_ids
 
-def test_encode_iterable():
-    ...
+def test_encode_non_ascii():
+    vocabs = {
+        i: bytes([i])
+        for i in range(256)
+    }
+    vocabs[256] = '👋'.encode()[:2]
+    vocabs[257] = '👋'.encode()[2:]
+    merges = [
+        (bytes([vocabs[256][0]]), bytes([vocabs[256][1]])),
+        (bytes([vocabs[257][0]]), bytes([vocabs[257][1]])),
+    ]
+    tokenizer = Tokenizer(
+        vocabs=vocabs,
+        merges=merges,
+    )
+    text = '👋'
+    expected_ids = [256, 257]
+    actual_ids = tokenizer.encode(text)
+    assert actual_ids == expected_ids
 
-def test_decode():
+def test_decode_non_ascii():
     tokenizer = Tokenizer(
         vocabs = {
             0: 'hello'.encode(),

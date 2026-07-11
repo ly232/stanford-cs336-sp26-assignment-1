@@ -12,6 +12,7 @@ from torch import Tensor
 
 from cs336_basics.tokenizer.bpe import BytePairEncoder
 from cs336_basics.tokenizer.pretokenizer import SpecialTokenAwarePretokenizer
+from cs336_basics.tokenizer.tokenizer import Tokenizer
 
 
 # From https://github.com/openai/gpt-2/blob/master/src/encoder.py#L53C31-L53C112
@@ -566,7 +567,12 @@ def get_tokenizer(
     Returns:
         A BPE tokenizer that uses the provided vocab, merges, and special tokens.
     """
-    raise NotImplementedError
+    tokenizer = Tokenizer(
+        vocabs=vocab,
+        merges=merges,
+        special_tokens=special_tokens,
+    )
+    return tokenizer
 
 
 def run_train_bpe(

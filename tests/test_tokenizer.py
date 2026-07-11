@@ -1,3 +1,7 @@
+'''
+uv run pytest tests/test_tokenizer.py
+'''
+
 from __future__ import annotations
 
 import json

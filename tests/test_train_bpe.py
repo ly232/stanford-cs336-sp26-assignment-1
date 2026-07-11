@@ -1,5 +1,5 @@
 '''
-uv run pytest tests/test_train_bpe.py::test_train_bpe
+uv run pytest tests/test_train_bpe.py
 '''
 
 import json

@@ -10,6 +10,8 @@ Example:
   output: ['a_pt1', '<sp1>', 'b_pt1'. 'b_pt2', '<sp2>', 'c_pt1']
 '''
 
+from typing import Iterable
+
 import regex
 
 # From https://github.com/openai/gpt-2/blob/master/src/encoder.py#L53C31-L53C112
@@ -25,7 +27,7 @@ class SpecialTokenAwarePretokenizer:
         self.special_tokens = special_tokens if special_tokens else []
         self.pretokenization_regex = pretokenization_regex
 
-    def pretokenize(self, text) -> list[str]:
+    def pretokenize(self, text: Iterable[str]) -> list[str]:
         def _pretokenize_internal(
                 text: str,
                 special_tokens: list[str] | None,

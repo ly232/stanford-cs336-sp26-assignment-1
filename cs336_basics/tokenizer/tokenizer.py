@@ -37,10 +37,11 @@ class Tokenizer:
         vocab_filepath: str,
         merges_filepath: str,
         special_tokens: list[str] | None = None):
-        ...
+        raise NotImplementedError
 
-    def encode(self, text: str) -> list[int]:
-        pretokens = self.pretokenizer.pretokenize(text)
+    def encode_iterable(self, iterable: Iterable[str]) \
+        -> Iterator[int]:
+        pretokens = self.pretokenizer.pretokenize(iterable)
 
         @cache
         def encode_pretoken(pretoken: str) -> list[int]:
@@ -51,6 +52,7 @@ class Tokenizer:
                 bytes([i])
                 for i in pretoken
             ])
+            buffer: deque[bytes] = deque([])
             while len(pretoken) >= 2:
                 first, second = pretoken.popleft(), pretoken.popleft()
                 found_merge = False
@@ -61,23 +63,23 @@ class Tokenizer:
                         found_merge = True
                         break
                 if not found_merge:
-                    # No more merges combine active list of pretokens' stop.
+                    # First token is no longer mergable, so place into buffer.
+                    # Second token still need to be examined, so put it back.
+                    buffer.append(first)
                     pretoken.appendleft(second)
-                    pretoken.appendleft(first)
-                    break
+            pretoken = buffer + pretoken
             return [
                 self.vocabs_to_index[v]
                 for v in pretoken
             ]
 
-        ids = []
         for pretoken in pretokens:
-            ids.extend(encode_pretoken(pretoken))
-        return ids
+            ids = encode_pretoken(pretoken)
+            for id in ids:
+                yield id
 
-    def encode_iterable(self, iterable: Iterable[str]) \
-        -> Iterator[int]:
-        ...
+    def encode(self, text: str) -> list[int]:
+        return [id for id in self.encode_iterable(text)]
 
     def decode(self, ids: list[int]) -> str:
         vocabs = [self.vocabs[i] for i in ids]
