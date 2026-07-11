@@ -48,29 +48,41 @@ class Tokenizer:
             pretoken = pretoken.encode()
             if pretoken in self.vocabs_to_index:
                 return [self.vocabs_to_index[pretoken]]
-            pretoken: deque[bytes] = deque([
+            bytes_seq: deque[bytes] = deque([
                 bytes([i])
                 for i in pretoken
             ])
-            buffer: deque[bytes] = deque([])
-            while len(pretoken) >= 2:
-                first, second = pretoken.popleft(), pretoken.popleft()
-                found_merge = False
-                for merge in self.merges:
-                    assert len(merge) == 2
-                    if (first, second) == merge:
-                        pretoken.appendleft(first + second)
-                        found_merge = True
-                        break
-                if not found_merge:
-                    # First token is no longer mergable, so place into buffer.
-                    # Second token still need to be examined, so put it back.
-                    buffer.append(first)
-                    pretoken.appendleft(second)
-            pretoken = buffer + pretoken
+            def maybe_merge(bytes_seq: deque[bytes]) -> bool:
+                '''One pass through of bytes seq to merge.
+                
+                Returns true iff merge happened.
+                '''
+                if len(bytes_seq) < 2:
+                    return False
+
+                buffer: deque[bytes] = deque([])
+                while len(bytes_seq) >= 2:
+                    l, r = bytes_seq.popleft(), bytes_seq.popleft()
+                    buffer.append(l)
+                    buffer.append(r)
+                    for merge in self.merges:
+                        if (l, r) == merge:
+                            buffer.pop()
+                            buffer.pop()
+                            buffer.append(l + r)
+                            while buffer:
+                                bytes_seq.appendleft(buffer.pop())
+                            return True
+                    # we want pairwise sliding window, not tumbling window.
+                    bytes_seq.appendleft(buffer.pop())
+                while buffer:
+                    bytes_seq.appendleft(buffer.pop())
+                return False
+            while maybe_merge(bytes_seq):
+                pass
             return [
                 self.vocabs_to_index[v]
-                for v in pretoken
+                for v in bytes_seq
             ]
 
         for pretoken in pretokens:

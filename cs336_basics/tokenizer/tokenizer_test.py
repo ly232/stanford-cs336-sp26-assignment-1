@@ -52,6 +52,23 @@ def test_encode_non_ascii():
     actual_ids = tokenizer.encode(text)
     assert actual_ids == expected_ids
 
+def test_encode_look_back():
+    vocabs = {
+        0: 'a'.encode(),
+        1: 'b'.encode(),
+        2: 'c'.encode(),
+        3: 'd'.encode(),
+        4: 'cd'.encode(),
+        5: 'bcd'.encode(),
+    }
+    merges = [
+        ('c'.encode(), 'd'.encode()),
+        ('b'.encode(), 'cd'.encode()),
+    ]
+    text = 'abcd'
+    tokenizer = Tokenizer(vocabs=vocabs, merges=merges)
+    assert tokenizer.encode(text) == [0, 5]
+
 def test_decode_non_ascii():
     tokenizer = Tokenizer(
         vocabs = {
