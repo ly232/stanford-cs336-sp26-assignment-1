@@ -11,6 +11,7 @@ import regex
 from torch import Tensor
 
 from cs336_basics.tokenizer.bpe import BytePairEncoder
+from cs336_basics.tokenizer.pretokenizer import SpecialTokenAwarePretokenizer
 
 
 # From https://github.com/openai/gpt-2/blob/master/src/encoder.py#L53C31-L53C112
@@ -597,8 +598,10 @@ def run_train_bpe(
     """
     with open(input_path, 'r') as f:
         text = f.read()
-        for sp in special_tokens:
-            text = text.replace(sp, '')
-    pretokens = regex.findall(PAT, text)
+    pretokenizer = SpecialTokenAwarePretokenizer(
+        special_tokens=special_tokens,
+        pretokenization_regex=PAT,
+    )
+    pretokens = pretokenizer.pretokenize(text)
     bpe = BytePairEncoder(pretokens, vocab_size, special_tokens)
     return bpe.train()
