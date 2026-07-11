@@ -24,10 +24,18 @@ class SpecialTokenAwarePretokenizer:
         special_tokens: list[str] | None = None,
         pretokenization_regex: str = PAT,
     ):
-        self.special_tokens = special_tokens if special_tokens else []
+        self.special_tokens = (
+            # favor longer special tokens first, as
+            # we pretokenize by greedily split based
+            # on this initialized order.
+            sorted(special_tokens, reverse=True)
+            if special_tokens
+            else []
+        )
         self.pretokenization_regex = pretokenization_regex
 
     def pretokenize(self, text: Iterable[str]) -> list[str]:
+        text = ''.join(text)
         def _pretokenize_internal(
                 text: str,
                 special_tokens: list[str] | None,

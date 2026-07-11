@@ -42,7 +42,6 @@ class Tokenizer:
     def encode_iterable(self, iterable: Iterable[str]) \
         -> Iterator[int]:
         pretokens = self.pretokenizer.pretokenize(iterable)
-
         @cache
         def encode_pretoken(pretoken: str) -> list[int]:
             pretoken = pretoken.encode()
