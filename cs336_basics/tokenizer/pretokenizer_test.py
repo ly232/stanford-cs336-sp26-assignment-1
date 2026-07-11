@@ -12,12 +12,15 @@ def test_special_token_aware_pretokenizer():
             '<sp2>',
         ]
     )
-    text = 'the<sp1>dog<sp2>ate'
+    text = 'the<sp1> dog <sp2>ate <sp1>'
     pretokens = pretokenizer.pretokenize(text)
     assert pretokens == [
         'the',
         '<sp1>',
-        'dog',
+        ' dog',
+        ' ',
         '<sp2>',
         'ate',
+        ' ',
+        '<sp1>',
     ]
