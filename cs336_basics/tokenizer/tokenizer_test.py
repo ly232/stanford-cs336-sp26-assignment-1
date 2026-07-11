@@ -20,7 +20,6 @@ def test_decode():
             3: b'\xc2',  # Invalid UTF8 bytes
         },
         merges = [],
-        special_tokens = [],
     )
 
     assert tokenizer.decode([1, 2, 0]) == '你好👋hello'
