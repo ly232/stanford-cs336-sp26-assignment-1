@@ -61,11 +61,13 @@ class Tokenizer:
                     return False
 
                 buffer: deque[bytes] = deque([])
-                while len(bytes_seq) >= 2:
-                    l, r = bytes_seq.popleft(), bytes_seq.popleft()
-                    buffer.append(l)
-                    buffer.append(r)
-                    for merge in self.merges:
+                # Nesting order matters. Must iterate merges first, then
+                # bytes_seq, in order to favor earlier merges.
+                for merge in self.merges:
+                    while len(bytes_seq) >= 2:
+                        l, r = bytes_seq.popleft(), bytes_seq.popleft()
+                        buffer.append(l)
+                        buffer.append(r)
                         if (l, r) == merge:
                             buffer.pop()
                             buffer.pop()
@@ -73,10 +75,10 @@ class Tokenizer:
                             while buffer:
                                 bytes_seq.appendleft(buffer.pop())
                             return True
-                    # we want pairwise sliding window, not tumbling window.
-                    bytes_seq.appendleft(buffer.pop())
-                while buffer:
-                    bytes_seq.appendleft(buffer.pop())
+                        # we want pairwise sliding window, not tumbling window.
+                        bytes_seq.appendleft(buffer.pop())
+                    while buffer:
+                        bytes_seq.appendleft(buffer.pop())
                 return False
             while maybe_merge(bytes_seq):
                 pass
