@@ -1,5 +1,5 @@
 '''
-uv run pytest tests/test_model.py::test_linear
+uv run pytest tests/test_model.py::test_embedding
 '''
 
 import numpy
