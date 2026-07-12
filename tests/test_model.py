@@ -1,5 +1,5 @@
 '''
-uv run pytest tests/test_model.py::test_embedding
+uv run pytest tests/test_model.py::test_rmsnorm
 '''
 
 import numpy
