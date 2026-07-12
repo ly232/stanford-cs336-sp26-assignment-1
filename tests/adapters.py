@@ -10,6 +10,7 @@ from jaxtyping import Bool, Float, Int
 import regex
 from torch import Tensor
 
+from cs336_basics.model.linear import Linear
 from cs336_basics.tokenizer.bpe import BytePairEncoder
 from cs336_basics.tokenizer.pretokenizer import SpecialTokenAwarePretokenizer
 from cs336_basics.tokenizer.tokenizer import Tokenizer
@@ -37,7 +38,15 @@ def run_linear(
         Float[Tensor, "... d_out"]: The transformed output of your linear module.
     """
 
-    raise NotImplementedError
+    model = Linear(
+        in_features=d_in,
+        out_features=d_out,
+    )
+    # Copies test provided weights. Exclude this copy operation from autograd.
+    with torch.no_grad():
+        model.weights.copy_(weights)
+    # Note: in_feature.shape is (batch seq_len, d_in)
+    return model(in_features)
 
 
 def run_embedding(

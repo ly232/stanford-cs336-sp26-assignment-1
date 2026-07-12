@@ -1,3 +1,7 @@
+'''
+uv run pytest tests/test_model.py::test_linear
+'''
+
 import numpy
 import torch
 import torch.nn.functional as F
