@@ -1,5 +1,5 @@
 '''
-uv run pytest tests/test_model.py::test_swiglu
+uv run pytest tests/test_model.py::test_rope
 '''
 
 import numpy

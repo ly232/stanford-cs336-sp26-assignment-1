@@ -14,6 +14,7 @@ from cs336_basics.model.embedding import Embedding
 from cs336_basics.model.linear import Linear
 from cs336_basics.model.positionwise_feedforward import PositionwiseFeedforward
 from cs336_basics.model.rms_norm import RmsNorm
+from cs336_basics.model.rotary_positional_embedding import RotaryPositionalEmbedding
 from cs336_basics.tokenizer.bpe import BytePairEncoder
 from cs336_basics.tokenizer.pretokenizer import SpecialTokenAwarePretokenizer
 from cs336_basics.tokenizer.tokenizer import Tokenizer
@@ -234,7 +235,12 @@ def run_rope(
     Returns:
         Float[Tensor, " ... sequence_length d_k"]: Tensor with RoPEd input.
     """
-    raise NotImplementedError
+    model = RotaryPositionalEmbedding(
+        theta=theta,
+        d_k=d_k,
+        max_seq_len=max_seq_len,
+    )
+    return model(in_query_or_key, token_positions)
 
 
 def run_transformer_block(
