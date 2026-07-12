@@ -12,6 +12,7 @@ from torch import Tensor
 
 from cs336_basics.model.embedding import Embedding
 from cs336_basics.model.linear import Linear
+from cs336_basics.model.positionwise_feedforward import PositionwiseFeedforward
 from cs336_basics.model.rms_norm import RmsNorm
 from cs336_basics.tokenizer.bpe import BytePairEncoder
 from cs336_basics.tokenizer.pretokenizer import SpecialTokenAwarePretokenizer
@@ -108,7 +109,15 @@ def run_swiglu(
     # swiglu.w1.weight.data = w1_weight
     # swiglu.w2.weight.data = w2_weight
     # swiglu.w3.weight.data = w3_weight
-    raise NotImplementedError
+    model = PositionwiseFeedforward(
+        d_model=d_model,
+        d_ff=d_ff,
+    )
+    with torch.no_grad():
+        model.w1.copy_(w1_weight)
+        model.w2.copy_(w2_weight)
+        model.w3.copy_(w3_weight)
+    return model(in_features)
 
 
 def run_scaled_dot_product_attention(
