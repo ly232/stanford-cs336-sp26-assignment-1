@@ -20,6 +20,7 @@ dependencies = [
     "ty>=0.0.26",
     "ruff>=0.15.8",
     "jax>=0.10.2",
+    "jupyter>=1.1.1",
 ]
 
 [build-system]
