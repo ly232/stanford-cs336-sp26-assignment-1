@@ -1,3 +1,7 @@
+'''
+uv run pytest tests/test_nn_utils.py::test_softmax_matches_pytorch
+'''
+
 import numpy
 import torch
 import torch.nn.functional as F
