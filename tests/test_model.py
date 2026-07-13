@@ -1,5 +1,5 @@
 '''
-uv run pytest tests/test_model.py
+uv run pytest tests/test_model.py::test_scaled_dot_product_attention
 '''
 
 import numpy
