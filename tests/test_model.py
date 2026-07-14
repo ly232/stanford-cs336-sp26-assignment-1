@@ -1,5 +1,6 @@
 '''
-uv run pytest tests/test_model.py::test_transformer_block
+uv run pytest tests/test_model.py::test_transformer_lm
+uv run pytest tests/test_model.py::test_transformer_lm_truncated_input
 '''
 
 import numpy

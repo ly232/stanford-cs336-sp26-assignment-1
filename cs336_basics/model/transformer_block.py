@@ -89,7 +89,7 @@ class TransformerBlock(torch.nn.Module):
         self,
         x: Float[torch.Tensor, 'batch seq d_model'],
         token_positions: Float[torch.Tensor, '... seq'] | None = None,
-    ) -> Float[torch.Tensor, '...']:
+    ) -> Float[torch.Tensor, 'batch seq d_model']:
         if token_positions is None:
             seq_len = x.shape[-2]
             token_positions = torch.arange(seq_len).to(x.device)

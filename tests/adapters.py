@@ -17,6 +17,7 @@ from cs336_basics.model.positionwise_feedforward import PositionwiseFeedforward
 from cs336_basics.model.rms_norm import RmsNorm
 from cs336_basics.model.rotary_positional_embedding import RotaryPositionalEmbedding
 from cs336_basics.model.transformer_block import TransformerBlock
+from cs336_basics.model.transformer_lm import TransformerLanguageModel
 from cs336_basics.nn_utils import utils
 from cs336_basics.tokenizer.bpe import BytePairEncoder
 from cs336_basics.tokenizer.pretokenizer import SpecialTokenAwarePretokenizer
@@ -465,7 +466,17 @@ def run_transformer_lm(
         Float[Tensor, "batch_size sequence_length vocab_size"]: Tensor with the predicted unnormalized
         next-word distribution for each token.
     """
-    raise NotImplementedError
+    model = TransformerLanguageModel(
+        vocab_size=vocab_size,
+        context_length=context_length,
+        d_model=d_model,
+        num_layers=num_layers,
+        num_heads=num_heads,
+        d_ff=d_ff,
+        rope_theta=rope_theta,
+    )
+    model.initialize_weights(weights)
+    return model(in_indices)
 
 
 def run_rmsnorm(

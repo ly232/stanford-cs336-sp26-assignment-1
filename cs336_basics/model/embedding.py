@@ -8,9 +8,7 @@ class Embedding(torch.nn.Module):
     def __init__(
         self,
         vocab_size: int,
-        embedding_dim: int,
-        device: torch.device | None = None,
-        dtype: torch.dtype | None = None):
+        embedding_dim: int):
         super().__init__()
         self.weights = torch.nn.Parameter(
             torch.nn.init.trunc_normal_(
