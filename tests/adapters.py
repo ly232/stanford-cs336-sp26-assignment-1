@@ -117,9 +117,9 @@ def run_swiglu(
         d_ff=d_ff,
     )
     with torch.no_grad():
-        model.w1.copy_(w1_weight)
-        model.w2.copy_(w2_weight)
-        model.w3.copy_(w3_weight)
+        model.w1.weights.copy_(w1_weight)
+        model.w2.weights.copy_(w2_weight)
+        model.w3.weights.copy_(w3_weight)
     return model(in_features)
 
 
