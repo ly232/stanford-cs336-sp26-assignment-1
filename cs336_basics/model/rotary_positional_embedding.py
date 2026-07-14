@@ -19,7 +19,6 @@ class RotaryPositionalEmbedding(torch.nn.Module):
         # That's also why in the `forward` method below, we also need an arg
         # for `token_positions`.
         max_seq_len: int,
-        device: torch.device | None = None,
     ):
         super().__init__()
         assert d_k % 2 == 0, f'RoPE only supports even dimenions; got {d_k}'

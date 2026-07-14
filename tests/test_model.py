@@ -1,5 +1,6 @@
 '''
-uv run pytest tests/test_model.py::test_scaled_dot_product_attention
+uv run pytest tests/test_model.py::test_multihead_self_attention
+uv run pytest tests/test_model.py::test_multihead_self_attention_with_rope
 '''
 
 import numpy

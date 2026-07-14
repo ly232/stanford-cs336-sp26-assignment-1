@@ -12,6 +12,7 @@ from torch import Tensor
 
 from cs336_basics.model.embedding import Embedding
 from cs336_basics.model.linear import Linear
+from cs336_basics.model.multi_head_attention import MultiHeadAttention
 from cs336_basics.model.positionwise_feedforward import PositionwiseFeedforward
 from cs336_basics.model.rms_norm import RmsNorm
 from cs336_basics.model.rotary_positional_embedding import RotaryPositionalEmbedding
@@ -174,7 +175,48 @@ def run_multihead_self_attention(
         Float[Tensor, " ... sequence_length d_model"]: Tensor with the output of running your optimized, batched multi-headed attention
         implementation with the given QKV projection weights and input features.
     """
-    raise NotImplementedError
+    # Construct MHA model:
+    model = MultiHeadAttention(
+        d_model=d_model,
+        num_heads=num_heads,
+    )
+    print(f'''
+    d_model: {d_model}
+    num_heads: {num_heads}
+    q_proj_weight.shape: {q_proj_weight.shape}
+    k_proj_weight.shape: {k_proj_weight.shape}
+    v_proj_weight.shape: {v_proj_weight.shape}
+    o_proj_weight.shape: {o_proj_weight.shape}
+    ''')
+
+    def reshape_weights(weights):
+        '''Reshapes (d_model, d_model) to (num_heads, d_k, d_model)'''
+        from einops import rearrange
+        return rearrange(
+            weights,
+            '(num_heads d_k) d_model -> num_heads d_k d_model',
+            d_k=d_model//num_heads,
+            num_heads=num_heads,
+        )
+
+    # Load initial weights; note since MHA has num_heads linear
+    # models, each owns separate weight matrices, here we need
+    # to split the test provided d_model by d_model weights to
+    # num_heads separate weight matrices to match against MHA's
+    # individual linear models for each head.
+    qw, kw, vw = (
+        reshape_weights(q_proj_weight),
+        reshape_weights(k_proj_weight),
+        reshape_weights(v_proj_weight),
+    )
+    with torch.no_grad():
+        for h in range(num_heads):
+            model.q_heads[h].weights.copy_(qw[h]),
+            model.k_heads[h].weights.copy_(kw[h]),
+            model.v_heads[h].weights.copy_(vw[h]),
+        model.output_layer.weights.copy_(o_proj_weight)
+    # Run inference:
+    return model(in_features)
 
 
 def run_multihead_self_attention_with_rope(
@@ -214,7 +256,50 @@ def run_multihead_self_attention_with_rope(
         Float[Tensor, " ... sequence_length d_model"]: Tensor with the output of running your optimized, batched multi-headed attention
         implementation with the given QKV projection weights and input features.
     """
-    raise NotImplementedError
+    # Construct MHA model:
+    model = MultiHeadAttention(
+        d_model=d_model,
+        num_heads=num_heads,
+        rope_theta=theta,
+        max_seq_len=max_seq_len,
+    )
+    print(f'''
+    d_model: {d_model}
+    num_heads: {num_heads}
+    q_proj_weight.shape: {q_proj_weight.shape}
+    k_proj_weight.shape: {k_proj_weight.shape}
+    v_proj_weight.shape: {v_proj_weight.shape}
+    o_proj_weight.shape: {o_proj_weight.shape}
+    ''')
+
+    def reshape_weights(weights):
+        '''Reshapes (d_model, d_model) to (num_heads, d_k, d_model)'''
+        from einops import rearrange
+        return rearrange(
+            weights,
+            '(num_heads d_k) d_model -> num_heads d_k d_model',
+            d_k=d_model//num_heads,
+            num_heads=num_heads,
+        )
+
+    # Load initial weights; note since MHA has num_heads linear
+    # models, each owns separate weight matrices, here we need
+    # to split the test provided d_model by d_model weights to
+    # num_heads separate weight matrices to match against MHA's
+    # individual linear models for each head.
+    qw, kw, vw = (
+        reshape_weights(q_proj_weight),
+        reshape_weights(k_proj_weight),
+        reshape_weights(v_proj_weight),
+    )
+    with torch.no_grad():
+        for h in range(num_heads):
+            model.q_heads[h].weights.copy_(qw[h]),
+            model.k_heads[h].weights.copy_(kw[h]),
+            model.v_heads[h].weights.copy_(vw[h]),
+        model.output_layer.weights.copy_(o_proj_weight)
+    # Run inference:
+    return model(in_features, token_positions)
 
 
 def run_rope(

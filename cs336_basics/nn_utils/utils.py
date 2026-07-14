@@ -28,6 +28,9 @@ def scaled_dot_product_attention(
         Q, K,
         '... queries d_k, ... keys d_k -> ... queries keys'
     ) / math.sqrt(d_k)
+    # print(f'!!!!! input.shape: {input.shape}')
+    # print(f'!!!!! Q.shape: {Q.shape}')
+    # print(f'!!!!! mask.shape: {mask.shape}')
     if mask is not None:
         input = input.masked_fill(~mask, float('-inf'))
     sm = softmax(
