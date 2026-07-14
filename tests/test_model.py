@@ -1,6 +1,5 @@
 '''
-uv run pytest tests/test_model.py::test_multihead_self_attention
-uv run pytest tests/test_model.py::test_multihead_self_attention_with_rope
+uv run pytest tests/test_model.py::test_transformer_block
 '''
 
 import numpy

@@ -16,6 +16,7 @@ from cs336_basics.model.multi_head_attention import MultiHeadAttention
 from cs336_basics.model.positionwise_feedforward import PositionwiseFeedforward
 from cs336_basics.model.rms_norm import RmsNorm
 from cs336_basics.model.rotary_positional_embedding import RotaryPositionalEmbedding
+from cs336_basics.model.transformer_block import TransformerBlock
 from cs336_basics.nn_utils import utils
 from cs336_basics.tokenizer.bpe import BytePairEncoder
 from cs336_basics.tokenizer.pretokenizer import SpecialTokenAwarePretokenizer
@@ -123,6 +124,17 @@ def run_swiglu(
     return model(in_features)
 
 
+def reshape_weights_for_multihead(weights, d_model, num_heads):
+    '''Reshapes (d_model, d_model) to (num_heads, d_k, d_model)'''
+    from einops import rearrange
+    return rearrange(
+        weights,
+        '(num_heads d_k) d_model -> num_heads d_k d_model',
+        d_k=d_model//num_heads,
+        num_heads=num_heads,
+    )
+
+
 def run_scaled_dot_product_attention(
     Q: Float[Tensor, " ... queries d_k"],
     K: Float[Tensor, " ... keys d_k"],
@@ -189,32 +201,13 @@ def run_multihead_self_attention(
     o_proj_weight.shape: {o_proj_weight.shape}
     ''')
 
-    def reshape_weights(weights):
-        '''Reshapes (d_model, d_model) to (num_heads, d_k, d_model)'''
-        from einops import rearrange
-        return rearrange(
-            weights,
-            '(num_heads d_k) d_model -> num_heads d_k d_model',
-            d_k=d_model//num_heads,
-            num_heads=num_heads,
-        )
-
-    # Load initial weights; note since MHA has num_heads linear
-    # models, each owns separate weight matrices, here we need
-    # to split the test provided d_model by d_model weights to
-    # num_heads separate weight matrices to match against MHA's
-    # individual linear models for each head.
-    qw, kw, vw = (
-        reshape_weights(q_proj_weight),
-        reshape_weights(k_proj_weight),
-        reshape_weights(v_proj_weight),
+    model.initialize_weights(
+        q_proj_weight,
+        k_proj_weight,
+        v_proj_weight,
+        o_proj_weight,
     )
-    with torch.no_grad():
-        for h in range(num_heads):
-            model.q_heads[h].weights.copy_(qw[h]),
-            model.k_heads[h].weights.copy_(kw[h]),
-            model.v_heads[h].weights.copy_(vw[h]),
-        model.output_layer.weights.copy_(o_proj_weight)
+
     # Run inference:
     return model(in_features)
 
@@ -272,32 +265,13 @@ def run_multihead_self_attention_with_rope(
     o_proj_weight.shape: {o_proj_weight.shape}
     ''')
 
-    def reshape_weights(weights):
-        '''Reshapes (d_model, d_model) to (num_heads, d_k, d_model)'''
-        from einops import rearrange
-        return rearrange(
-            weights,
-            '(num_heads d_k) d_model -> num_heads d_k d_model',
-            d_k=d_model//num_heads,
-            num_heads=num_heads,
-        )
-
-    # Load initial weights; note since MHA has num_heads linear
-    # models, each owns separate weight matrices, here we need
-    # to split the test provided d_model by d_model weights to
-    # num_heads separate weight matrices to match against MHA's
-    # individual linear models for each head.
-    qw, kw, vw = (
-        reshape_weights(q_proj_weight),
-        reshape_weights(k_proj_weight),
-        reshape_weights(v_proj_weight),
+    model.initialize_weights(
+        q_proj_weight,
+        k_proj_weight,
+        v_proj_weight,
+        o_proj_weight,
     )
-    with torch.no_grad():
-        for h in range(num_heads):
-            model.q_heads[h].weights.copy_(qw[h]),
-            model.k_heads[h].weights.copy_(kw[h]),
-            model.v_heads[h].weights.copy_(vw[h]),
-        model.output_layer.weights.copy_(o_proj_weight)
+
     # Run inference:
     return model(in_features, token_positions)
 
@@ -336,7 +310,7 @@ def run_transformer_block(
     max_seq_len: int,
     theta: float,
     weights: dict[str, Tensor],
-    in_features: Float[Tensor, " batch sequence_length d_model"],
+    in_features: Float[Tensor, "batch sequence_length d_model"],
 ) -> Float[Tensor, " batch sequence_length d_model"]:
     """
     Given the weights of a pre-norm Transformer block and input features,
@@ -399,7 +373,17 @@ def run_transformer_block(
         Float[Tensor, "batch sequence_length d_model"] Tensor with the output of
         running the Transformer block on the input features while using RoPE.
     """
-    raise NotImplementedError
+    # Initialize model.
+    model = TransformerBlock(
+        d_model=d_model,
+        num_heads=num_heads,
+        d_ff=d_ff,
+        max_seq_len=max_seq_len,
+        theta=theta,
+    )
+    model.initialize_weights(weights)
+    # Run inference.
+    return model(in_features)
 
 
 def run_transformer_lm(

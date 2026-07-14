@@ -9,9 +9,7 @@ class RmsNorm(torch.nn.Module):
     def __init__(
         self,
         d_model: int,
-        eps: float = 1e-5,
-        device: torch.device | None = None,
-        dtype: torch.dtype | None = None):
+        eps: float = 1e-5):
         super().__init__()
         self.d_model = d_model
         self.eps = eps

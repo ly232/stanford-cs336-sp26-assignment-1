@@ -57,6 +57,39 @@ class MultiHeadAttention(torch.nn.Module):
         else:
             self.rope_layer = None
 
+    def _reshape_weights_for_multihead(self, weights):
+        '''Reshapes (d_model, d_model) to (num_heads, d_k, d_model)'''
+        return rearrange(
+            weights,
+            '(num_heads d_k) d_model -> num_heads d_k d_model',
+            d_k=self.d_model//self.num_heads,
+            num_heads=self.num_heads,
+        )
+
+    def initialize_weights(
+            self,
+            q_weight: Float[torch.Tensor, 'd_model d_model'],
+            k_weight: Float[torch.Tensor, 'd_model d_model'],
+            v_weight: Float[torch.Tensor, 'd_model d_model'],
+            o_weight: Float[torch.Tensor, 'd_model d_model'],
+        ) -> None:
+        '''Initializes each head's and output layer's weights.
+        
+        Input Q K V weights are not split by head; this method reshapes the
+        input weights and assigns to each individual heads.
+        '''
+        qw, kw, vw = (
+            self._reshape_weights_for_multihead(q_weight),
+            self._reshape_weights_for_multihead(k_weight),
+            self._reshape_weights_for_multihead(v_weight),
+        )
+        with torch.no_grad():
+            for h in range(self.num_heads):
+                self.q_heads[h].weights.copy_(qw[h])
+                self.k_heads[h].weights.copy_(kw[h])
+                self.v_heads[h].weights.copy_(vw[h])
+            self.output_layer.weights.copy_(o_weight)
+
     def forward(
         self,
         x: Float[torch.Tensor, '... sequence_length d_model'],
