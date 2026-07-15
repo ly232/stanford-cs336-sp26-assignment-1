@@ -24,8 +24,9 @@ class PositionwiseFeedforward(torch.nn.Module):
 
     def _swiglu(self, x: Float[torch.Tensor, 'batch seq d_model'])\
         -> Float[torch.Tensor, 'batch seq d_model']:
-        silu_w1_x = self._silu(self.w1(x))
-        w3_x = self.w3(x)
+        silu_w1_x: Float[torch.Tensor, 'batch seq d_ff'] =\
+            self._silu(self.w1(x))
+        w3_x: Float[torch.Tensor, 'batch seq d_ff'] = self.w3(x)
         return self.w2(silu_w1_x * w3_x)
 
     def forward(self, x: Float[torch.Tensor, 'batch seq d_model'])\

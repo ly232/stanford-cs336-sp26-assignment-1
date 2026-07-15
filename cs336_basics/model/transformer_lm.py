@@ -21,7 +21,7 @@ class TransformerLanguageModel(torch.nn.Module):
         num_layers: int,
         num_heads: int,
         d_ff: int,
-        rope_theta: float,
+        rope_theta: float | None = None,
     ):
         super().__init__()
         self.num_layers = num_layers
