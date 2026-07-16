@@ -1,5 +1,5 @@
 '''
-uv run pytest tests/test_nn_utils.py::test_softmax_matches_pytorch
+uv run pytest tests/test_nn_utils.py::test_cross_entropy
 '''
 
 import numpy

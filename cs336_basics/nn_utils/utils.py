@@ -5,7 +5,9 @@ from jaxtyping import Float, Int, Bool, UInt8, Array
 
 import torch
 
-def softmax(input: torch.Tensor, dim: int) -> torch.Tensor:
+def softmax(
+    input: Float[torch.Tensor, '... vocab_size'],
+    dim: int = -1) -> Float[torch.Tensor, '... vocab_size']:
     offset = torch.max(input, dim=dim, keepdim=True).values
     input = input - offset
     numerator = torch.exp(input)
@@ -28,9 +30,6 @@ def scaled_dot_product_attention(
         Q, K,
         '... queries d_k, ... keys d_k -> ... queries keys'
     ) / math.sqrt(d_k)
-    # print(f'!!!!! input.shape: {input.shape}')
-    # print(f'!!!!! Q.shape: {Q.shape}')
-    # print(f'!!!!! mask.shape: {mask.shape}')
     if mask is not None:
         input = input.masked_fill(~mask, float('-inf'))
     sm = softmax(
@@ -41,3 +40,45 @@ def scaled_dot_product_attention(
         sm, V,
         '... queries keys, ... keys dv -> ... queries dv'
     )
+
+def cross_entropy(
+    logits: Float[torch.Tensor, 'batch vocab'],
+    targets: Int[torch.Tensor, 'batch']
+) -> Float[torch.Tensor, '']:
+    '''Calculates the cross entropy of a batch of *tokens*.
+
+    Note the logits shape is 'batch vocab', not 'batch seq vocab',
+    meaning the cross entropy is fixiated against a single token.
+    As such, we can only average over the batch dimension, not the
+    sequence dimension. This is a bit different from the assignment
+    instruction's section 4 equation 16, where that equation is
+    generalized to average over both batch and sequence dimensions.
+
+    Args:
+        logits: token's tensor, shape is (batch, vocab).
+        targets: vocab index of the ground truth, shape is (batch,)
+
+    Returns:
+        Cross entropy loss *of the single token*. averaged over batch.
+        Shape is (1,).
+    '''
+    # Subtract baseline for numerical stability, aka "log sum exp trick".
+    # See numeric_stability_memo.ipynb for details.
+    logits = logits - torch.max(input=logits, dim=-1, keepdim=True).values
+    logits_at_targets: Float[torch.Tensor, 'batch 1'] = torch.gather(
+        input=logits,
+        dim=-1,
+        index=targets.unsqueeze(-1),
+    )
+    log_probs = (
+        logits_at_targets
+        - torch.log(
+            torch.sum(
+                input=torch.exp(logits),
+                dim=-1,
+                keepdim=True,
+            )
+        )
+    ).squeeze(-1)
+    return -torch.mean(log_probs)
+
