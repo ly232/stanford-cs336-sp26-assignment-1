@@ -1,3 +1,7 @@
+'''
+uv run pytest tests/test_optimizer.py::test_adamw
+'''
+
 import numpy
 import torch
 
