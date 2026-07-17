@@ -81,4 +81,3 @@ def cross_entropy(
         )
     ).squeeze(-1)
     return -torch.mean(log_probs)
-
