@@ -42,17 +42,10 @@ def scaled_dot_product_attention(
     )
 
 def cross_entropy(
-    logits: Float[torch.Tensor, 'batch vocab'],
-    targets: Int[torch.Tensor, 'batch']
+    logits: Float[torch.Tensor, 'batch ... vocab'],
+    targets: Int[torch.Tensor, 'batch ...']
 ) -> Float[torch.Tensor, '']:
     '''Calculates the cross entropy of a batch of *tokens*.
-
-    Note the logits shape is 'batch vocab', not 'batch seq vocab',
-    meaning the cross entropy is fixiated against a single token.
-    As such, we can only average over the batch dimension, not the
-    sequence dimension. This is a bit different from the assignment
-    instruction's section 4 equation 16, where that equation is
-    generalized to average over both batch and sequence dimensions.
 
     Args:
         logits: token's tensor, shape is (batch, vocab).

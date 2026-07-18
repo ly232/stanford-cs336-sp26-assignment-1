@@ -18,9 +18,10 @@ class TransformerBlock(torch.nn.Module):
         num_heads: int,
         d_ff: int,
         max_seq_len: int,
-        theta: float,
+        theta: float | None = None,
     ):
         super().__init__()
+        self.rope_theta = theta
         self.mha_prenorm_layer = RmsNorm(d_model)
         self.mha_layer = MultiHeadAttention(
             d_model, num_heads, theta, max_seq_len)
@@ -90,7 +91,7 @@ class TransformerBlock(torch.nn.Module):
         x: Float[torch.Tensor, 'batch seq d_model'],
         token_positions: Float[torch.Tensor, '... seq'] | None = None,
     ) -> Float[torch.Tensor, 'batch seq d_model']:
-        if token_positions is None:
+        if self.rope_theta is not None:
             seq_len = x.shape[-2]
             token_positions = torch.arange(seq_len).to(x.device)
         mha = x + self.mha_layer(

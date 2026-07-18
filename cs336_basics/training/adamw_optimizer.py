@@ -27,6 +27,15 @@ class AdamW(torch.optim.Optimizer):
         # self.state.
         super().__init__(params, defaults)
 
+    def count_trainable_params(self):
+        '''Returns number of trainable params for this optimizer.'''
+        return sum(
+            p.numel()
+            for pg in self.param_groups
+            for p in pg['params']
+            if p.requires_grad
+        )
+
     def step(self, closure: Optional[Callable] = None):
         loss = None if closure is None else closure()
         for group in self.param_groups:
