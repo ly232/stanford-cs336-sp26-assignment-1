@@ -1,5 +1,5 @@
 '''
-uv run pytest tests/test_optimizer.py::test_adamw
+uv run pytest tests/test_optimizer.py::test_get_lr_cosine_schedule
 '''
 
 import numpy
