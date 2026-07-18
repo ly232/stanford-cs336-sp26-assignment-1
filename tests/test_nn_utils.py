@@ -1,5 +1,5 @@
 '''
-uv run pytest tests/test_nn_utils.py::test_cross_entropy
+uv run pytest tests/test_nn_utils.py::test_gradient_clipping
 '''
 
 import numpy

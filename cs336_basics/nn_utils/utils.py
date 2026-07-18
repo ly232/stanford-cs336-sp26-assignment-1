@@ -2,6 +2,7 @@ import math
 
 from einops import rearrange, einsum
 from jaxtyping import Float, Int, Bool, UInt8, Array
+from typing import Iterable
 
 import torch
 
@@ -96,3 +97,20 @@ def get_lr_cosine_schedule(
         )
     return min_learning_rate
 
+def clip_gradient(
+    parameters: Iterable[torch.nn.Parameter],
+    max_l2_norm: float
+) -> None:
+    '''Clips gradient in-place.'''
+    global_norm = math.sqrt(
+        sum(
+            p.grad.norm() ** 2
+            for p in parameters
+            if p.grad is not None)
+        )
+    if global_norm > max_l2_norm:
+        scale = max_l2_norm / (global_norm + 1e-6)
+        for p in parameters:
+            if p.grad is None:
+                continue
+            p.grad.mul_(scale)
