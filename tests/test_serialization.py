@@ -1,3 +1,7 @@
+'''
+uv run pytest tests/test_serialization.py::test_checkpointing
+'''
+
 import numpy
 import torch
 import torch.nn as nn

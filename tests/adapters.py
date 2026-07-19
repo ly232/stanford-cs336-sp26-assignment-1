@@ -10,6 +10,7 @@ from jaxtyping import Bool, Float, Int
 import regex
 from torch import Tensor
 
+from cs336_basics.data import checkpointing
 from cs336_basics.data import data_loader
 from cs336_basics.model.embedding import Embedding
 from cs336_basics.model.linear import Linear
@@ -650,7 +651,7 @@ def run_save_checkpoint(
             we've completed.
         out (str | os.PathLike | BinaryIO | IO[bytes]): Path or file-like object to serialize the model, optimizer, and iteration to.
     """
-    raise NotImplementedError
+    return checkpointing.save_checkpoint(model, optimizer, iteration, out)
 
 
 def run_load_checkpoint(
@@ -671,7 +672,7 @@ def run_load_checkpoint(
     Returns:
         int: the previously-serialized number of iterations.
     """
-    raise NotImplementedError
+    return checkpointing.load_checkpoint(src, model, optimizer)
 
 
 def get_tokenizer(
