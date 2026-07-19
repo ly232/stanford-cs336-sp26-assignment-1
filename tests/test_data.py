@@ -1,3 +1,7 @@
+'''
+uv run pytest tests/test_data.py::test_get_batch
+'''
+
 import math
 from collections import Counter
 

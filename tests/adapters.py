@@ -10,6 +10,7 @@ from jaxtyping import Bool, Float, Int
 import regex
 from torch import Tensor
 
+from cs336_basics.data import data_loader
 from cs336_basics.model.embedding import Embedding
 from cs336_basics.model.linear import Linear
 from cs336_basics.model.multi_head_attention import MultiHeadAttention
@@ -543,7 +544,7 @@ def run_get_batch(
         is the sampled input sequences, and the second tuple item is the corresponding
         language modeling labels.
     """
-    raise NotImplementedError
+    return data_loader.get_batch(dataset, batch_size, context_length, device)
 
 
 def run_softmax(in_features: Float[Tensor, " ..."], dim: int) -> Float[Tensor, " ..."]:
