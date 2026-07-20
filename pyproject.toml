@@ -22,6 +22,7 @@ dependencies = [
     "jax>=0.10.2",
     "jupyter>=1.1.1",
     "matplotlib>=3.11.0",
+    "datasets>=5.0.0",
 ]
 
 [build-system]

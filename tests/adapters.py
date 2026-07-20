@@ -737,5 +737,9 @@ def run_train_bpe(
         pretokenization_regex=PAT,
     )
     pretokens = pretokenizer.pretokenize(text)
-    bpe = BytePairEncoder(pretokens, vocab_size, special_tokens)
+    bpe = BytePairEncoder(
+        vocab_size=vocab_size,
+        special_tokens=special_tokens,
+        pretokens=pretokens,
+    )
     return bpe.train()

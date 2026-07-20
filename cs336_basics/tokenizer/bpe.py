@@ -10,12 +10,12 @@ class BytePairEncoder:
 
     def __init__(
         self, 
-        pretokens: list[str], 
         vocab_size: int, 
-        special_tokens: list[str]):
+        special_tokens: list[str],
+        pretokens: list[str] | None = None,
+    ):
         
         # Holds original init input.
-        self._pretokens = pretokens
         self._target_vocab_size = vocab_size
         self._special_tokens = special_tokens
 
@@ -37,7 +37,13 @@ class BytePairEncoder:
         # concatinated bytes together is ALWAYS the pretoken.
         self._freq: dict[tuple[bytes, ...], int] \
             = collections.Counter()
-        for pt in self._pretokens:
+        
+        if pretokens is not None:
+            self.update_pretokens(pretokens)
+        
+    def update_pretokens(self, pretokens: list[str]) -> None:
+        '''Updates internal freq counter for new pretokens.'''
+        for pt in pretokens:
             key = tuple([
                 bytes([b])
                 for b in pt.encode()
