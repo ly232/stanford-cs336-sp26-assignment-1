@@ -1,0 +1,7 @@
+# Configs for Byte Pair Encoder.
+input_file: ./tests/fixtures/tinystories_sample_5M.txt
+special_tokens:
+  - <|endoftext|>
+vocab_size: 10000
+output_bpe_vocabs_file: ./cs336_basics/training/bpe_vocabs.pkl
+output_bpe_merges_file: ./cs336_basics/training/bpe_merges.pkl

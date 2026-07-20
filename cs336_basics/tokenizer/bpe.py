@@ -3,6 +3,8 @@
 import collections
 import itertools
 
+import tqdm
+
 class BytePairEncoder:
     """Bype pair encoder."""
 
@@ -94,6 +96,12 @@ class BytePairEncoder:
     def train(self) -> \
         tuple[dict[int, bytes], list[tuple[bytes, bytes]]]:
         '''Runs BPE training until accumulating enough vocabs.'''
-        while len(self._vocabs) < self._target_vocab_size:
-            self._merge()
+        total_merges = self._target_vocab_size - len(self._vocabs)
+        
+        with tqdm.tqdm(total=total_merges, desc='BPE training') as pbar:
+            while len(self._vocabs) < self._target_vocab_size:
+                old_vocabs_count = len(self._vocabs)
+                self._merge()
+                new_vocabs_count = len(self._vocabs)
+                pbar.update(new_vocabs_count - old_vocabs_count)
         return self._vocabs, self._merges
