@@ -22,7 +22,8 @@ from cs336_basics.model.transformer_block import TransformerBlock
 from cs336_basics.model.transformer_lm import TransformerLanguageModel
 from cs336_basics.nn_utils import utils
 from cs336_basics.training.adamw_optimizer import AdamW
-from cs336_basics.tokenizer.bpe import BytePairEncoder
+# from cs336_basics.tokenizer.bpe import BytePairEncoder
+from cs336_basics.tokenizer.bpe_v2 import BytePairEncoder
 from cs336_basics.tokenizer.pretokenizer import SpecialTokenAwarePretokenizer
 from cs336_basics.tokenizer.tokenizer import Tokenizer
 

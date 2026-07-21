@@ -3,7 +3,8 @@
 uv run pytest cs336_basics/tokenizer/bpe_test.py
 '''
 
-from cs336_basics.tokenizer.bpe import BytePairEncoder
+# from cs336_basics.tokenizer.bpe import BytePairEncoder
+from cs336_basics.tokenizer.bpe_v2 import BytePairEncoder
 
 def test_init():
     special_tokens = ['sp1', 'sp2', 'sp3']
