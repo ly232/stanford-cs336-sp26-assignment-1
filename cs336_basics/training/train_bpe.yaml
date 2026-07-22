@@ -6,6 +6,7 @@ tinystories_sample_5M:
   vocab_size: 10000
   output_bpe_vocabs_file: ./cs336_basics/training/tinystories_sample_5M_bpe_vocabs.pkl
   output_bpe_merges_file: ./cs336_basics/training/tinystories_sample_5M_bpe_merges.pkl
+  output_pretokens_counter_file: ./cs336_basics/training/tinystories_sample_5M_pretokens_counter.pkl
 
 openwebtext_validation:
   input_file: ./owt-sample/owt_valid.txt
@@ -14,7 +15,7 @@ openwebtext_validation:
   vocab_size: 32000
   output_bpe_vocabs_file: ./cs336_basics/training/openwebtext_validation_bpe_vocabs.pkl
   output_bpe_merges_file: ./cs336_basics/training/openwebtext_validation_bpe_merges.pkl
-
+  output_pretokens_counter_file: ./cs336_basics/training/openwebtext_validation_pretokens_counter.pkl
 
 openwebtext_train:
   input_file: ./owt-sample/owt_train.txt
@@ -23,3 +24,5 @@ openwebtext_train:
   vocab_size: 32000
   output_bpe_vocabs_file: ./cs336_basics/training/openwebtext_train_bpe_vocabs.pkl
   output_bpe_merges_file: ./cs336_basics/training/openwebtext_train_bpe_merges.pkl
+  pretokenize_with_multiprocessing: true
+  output_pretokens_counter_file: ./cs336_basics/training/openwebtext_train_pretokens_counter.pkl

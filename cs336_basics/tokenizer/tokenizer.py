@@ -2,6 +2,8 @@ from collections import deque
 from functools import cache
 from typing import Iterable, Iterator
 
+import pickle
+
 from cs336_basics.tokenizer.pretokenizer import SpecialTokenAwarePretokenizer
 
 # From https://github.com/openai/gpt-2/blob/master/src/encoder.py#L53C31-L53C112
@@ -37,7 +39,11 @@ class Tokenizer:
         vocab_filepath: str,
         merges_filepath: str,
         special_tokens: list[str] | None = None):
-        raise NotImplementedError
+        with open(vocab_filepath, 'rb') as f:
+            vocabs = pickle.load(f)
+        with open(merges_filepath, 'rb') as f:
+            merges = pickle.load(f)
+        return cls(vocabs, merges, special_tokens)
 
     def encode_iterable(self, iterable: Iterable[str]) \
         -> Iterator[int]:

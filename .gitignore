@@ -165,3 +165,4 @@ cython_debug/
 # Datasets
 # hf download stanford-cs336/owt-sample --repo-type dataset --local-dir ./owt-sample
 owt-sample/
+cs336_basics/training/*pretokens_counter.pkl
