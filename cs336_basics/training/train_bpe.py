@@ -4,12 +4,8 @@ uv run python -m cProfile -s tottime cs336_basics/training/train_bpe.py --corpus
 uv run python -m cProfile -s tottime cs336_basics/training/train_bpe.py --corpus openwebtext | head -n 100
 '''
 
-# Work around HuggingFace connection issues from China.
-# IMPORTANT: Must set this BEFORE any datasets/huggingface_hub import.
-import os
-os.environ["HF_ENDPOINT"] = "https://hf-mirror.com"
-
 import argparse
+import collections
 import pickle
 
 import yaml
@@ -38,7 +34,7 @@ def main():
     with open(input_file, 'r') as f:
         training_text = f.read()
     pretokens = pretokenizer.pretokenize(training_text)
-    bpe.update_pretokens(pretokens=pretokens)
+    bpe.update_pretokens(collections.Counter(pretokens))
 
     # Start training.
     print('Training BPE...')

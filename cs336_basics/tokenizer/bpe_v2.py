@@ -155,17 +155,17 @@ class BytePairEncoder:
         self._byte_pair_counter = BytePairCounter()
         
         if pretokens is not None:
-            self.update_pretokens(pretokens)
+            self.update_pretokens(collections.Counter(pretokens))
         
-    def update_pretokens(self, pretokens: list[str]) -> None:
+    def update_pretokens(self, pretokens_freq: dict[str, int]) -> None:
         '''Updates internal freq counter for new pretokens.'''
         pair_delta = collections.Counter()
-        for pt in pretokens:
+        for pt, cnt in pretokens_freq.items():
             key = tuple([
                 bytes([b])
                 for b in pt.encode()
             ])
-            self._pretoken_counter.update_freq_amount(key, 1)
+            self._pretoken_counter.update_freq_amount(key, cnt)
             for l, r in itertools.pairwise(key):
                 pair_delta[(l, r)] += 1
         self._byte_pair_counter.update_counts(pair_delta)
