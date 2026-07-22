@@ -167,7 +167,7 @@ class BytePairEncoder:
             ])
             self._pretoken_counter.update_freq_amount(key, cnt)
             for l, r in itertools.pairwise(key):
-                pair_delta[(l, r)] += 1
+                pair_delta[(l, r)] += cnt
         self._byte_pair_counter.update_counts(pair_delta)
 
     def _pair_to_merge(self) -> tuple[bytes, bytes]:

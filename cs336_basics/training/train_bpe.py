@@ -1,7 +1,8 @@
 '''Trains the byte pair encoder.
 
 uv run python -m cProfile -s tottime cs336_basics/training/train_bpe.py --corpus tinystories_sample_5M | head -n 100
-uv run python -m cProfile -s tottime cs336_basics/training/train_bpe.py --corpus openwebtext | head -n 100
+uv run python -m cProfile -s tottime cs336_basics/training/train_bpe.py --corpus openwebtext_validation | head -n 100
+uv run python -m cProfile -s tottime cs336_basics/training/train_bpe.py --corpus openwebtext_train | head -n 100
 '''
 
 import argparse
@@ -33,7 +34,9 @@ def main():
     # Load data file.
     with open(input_file, 'r') as f:
         training_text = f.read()
+    print('Pretokenzing training text...')
     pretokens = pretokenizer.pretokenize(training_text)
+    print('Updating pretokens into BPE...')
     bpe.update_pretokens(collections.Counter(pretokens))
 
     # Start training.
@@ -50,7 +53,7 @@ if __name__ == '__main__':
     # Commandline args parsing.
     parser = argparse.ArgumentParser(description='BPE trainer.')
     parser.add_argument('--corpus', type=str, default='tinystories_sample_5M', 
-                        help='training corpus, e.g. tinystories_sample_5M, or openwebtext')
+                        help='training corpus, e.g. tinystories_sample_5M')
     args = parser.parse_args()
 
     # Main.

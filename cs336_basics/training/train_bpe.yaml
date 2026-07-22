@@ -7,10 +7,19 @@ tinystories_sample_5M:
   output_bpe_vocabs_file: ./cs336_basics/training/tinystories_sample_5M_bpe_vocabs.pkl
   output_bpe_merges_file: ./cs336_basics/training/tinystories_sample_5M_bpe_merges.pkl
 
-openwebtext:
+openwebtext_validation:
   input_file: ./owt-sample/owt_valid.txt
   special_tokens:
     - <|endoftext|>
   vocab_size: 32000
-  output_bpe_vocabs_file: ./cs336_basics/training/openwebtext_bpe_vocabs.pkl
-  output_bpe_merges_file: ./cs336_basics/training/openwebtext_bpe_merges.pkl
+  output_bpe_vocabs_file: ./cs336_basics/training/openwebtext_validation_bpe_vocabs.pkl
+  output_bpe_merges_file: ./cs336_basics/training/openwebtext_validation_bpe_merges.pkl
+
+
+openwebtext_train:
+  input_file: ./owt-sample/owt_train.txt
+  special_tokens:
+    - <|endoftext|>
+  vocab_size: 32000
+  output_bpe_vocabs_file: ./cs336_basics/training/openwebtext_train_bpe_vocabs.pkl
+  output_bpe_merges_file: ./cs336_basics/training/openwebtext_train_bpe_merges.pkl
