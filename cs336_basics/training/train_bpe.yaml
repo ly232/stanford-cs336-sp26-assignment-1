@@ -8,7 +8,7 @@ tinystories_sample_5M:
   output_bpe_merges_file: ./cs336_basics/training/tinystories_sample_5M_bpe_merges.pkl
 
 openwebtext:
-  input_file: openwebtext
+  input_file: ./owt-sample/owt_valid.txt
   special_tokens:
     - <|endoftext|>
   vocab_size: 32000

@@ -161,3 +161,7 @@ cython_debug/
 
 .ruff_cache/
 *.zip
+
+# Datasets
+# hf download stanford-cs336/owt-sample --repo-type dataset --local-dir ./owt-sample
+owt-sample/

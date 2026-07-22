@@ -12,7 +12,6 @@ os.environ["HF_ENDPOINT"] = "https://hf-mirror.com"
 import argparse
 import pickle
 
-from datasets import load_dataset
 import yaml
 
 # from cs336_basics.tokenizer.bpe import BytePairEncoder
@@ -34,25 +33,14 @@ def main():
     print('Loading training text and initiating BPE with pretokens.')
     bpe = BytePairEncoder(vocab_size, special_tokens)
     pretokenizer = SpecialTokenAwarePretokenizer(special_tokens)
-    if args.corpus == 'openwebtext':
-        dataset = load_dataset(
-            # This dataset does not require an HF token.
-            'Skylion007/openwebtext',
-            split='train',
-            streaming=True,
-        )
-        print('Streaming HuggingFace openwebtext...')
-        for i, document in enumerate(dataset):
-            pretokens = pretokenizer.pretokenize(document['text'])
-            bpe.update_pretokens(pretokens=pretokens)
-            if i % 10000 == 0:
-                print(f'    processed {i} openwebtext documents...')
-    else:
-        with open(input_file, 'r') as f:
-            training_text = f.read()
-        pretokens = pretokenizer.pretokenize(training_text)
-        bpe.update_pretokens(pretokens=pretokens)
 
+    # Load data file.
+    with open(input_file, 'r') as f:
+        training_text = f.read()
+    pretokens = pretokenizer.pretokenize(training_text)
+    bpe.update_pretokens(pretokens=pretokens)
+
+    # Start training.
     print('Training BPE...')
     vocabs, merges = bpe.train()
     print('Saving trained vocabs and merges...')
