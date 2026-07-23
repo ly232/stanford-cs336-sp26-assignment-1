@@ -15,10 +15,11 @@ import collections
 import functools
 import itertools
 import multiprocessing
+import numpy as np
 import os
 import pickle
 
-from cs336_basics.training.input_file_chunker import split_and_process
+from cs336_basics.training.input_file_chunker import read_chunk, split_and_process
 from cs336_basics.tokenizer.bpe_v2 import BytePairEncoder
 from cs336_basics.tokenizer.pretokenizer import SpecialTokenAwarePretokenizer
 
@@ -41,14 +42,9 @@ def pretokenize_chunk(
 
     Returns a counter from pretoken to count of the file chunk.
     '''
-    start, end = start_end
+    training_text = read_chunk(input_file=input_file, start_end=start_end)
     pretokenizer = SpecialTokenAwarePretokenizer(special_tokens)
-    with open(input_file, 'rb') as f:
-        f.seek(start)
-        training_text =\
-            f.read(end - start).decode("utf-8", errors="ignore")
-        return collections.Counter(
-            pretokenizer.pretokenize(training_text))
+    return collections.Counter(pretokenizer.pretokenize(training_text))
 
 def generate_pretokens_counter(
     input_file: str,

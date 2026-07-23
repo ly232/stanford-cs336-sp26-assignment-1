@@ -12,14 +12,24 @@ import multiprocessing
 
 from cs336_basics.pretokenization_example import find_chunk_boundaries
 
+def read_chunk(
+    input_file: str,
+    start_end: tuple[int, int],
+) -> str:
+    '''Reads a chunk within given input file.'''
+    start, end = start_end
+    with open(input_file, 'rb') as f:
+        f.seek(start)
+        return f.read(end - start).decode("utf-8", errors="ignore")
+
 def split_and_process(
     input_file: str,
     special_tokens: list[str],
-    map_fn: Callable[[Iterable], Any],
+    map_fn: Callable[..., Any],
     reduce_fn: Callable[..., Any] = lambda x: x,
     num_workers: int = 2,
     num_chunks: int = 10,
-):
+) -> Any:
     '''Splits the input file into chunks to process
     
     Args:
