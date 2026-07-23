@@ -1,8 +1,9 @@
 '''Main script to run training loop.
 
-uv run python cs336_basics/training/training_loop.py
+uv run python cs336_basics/training/training_loop.py --corpus tinystories_sample_5M
 '''
 
+import argparse
 import tqdm
 import torch
 import yaml
@@ -27,38 +28,40 @@ elif torch.backends.mps.is_available():
 
 def main():
     # Parse job configs to get hyperparameters.
-    num_steps = ...
-    batch_size = ...
-    vocab_size = ...
-    context_length = ...
-    d_model = ...
-    num_layers = ...
-    num_heads = ...
-    d_ff = ...
-    rope_theta = ...
-    special_tokens = ...
-    checkpointing_interval = ...
-    output_file = ...
-    # AdamW optimizer gradient stability parameters
-    max_l2_norm = ...
-    max_learning_rate = ...
-    min_learning_rate = ...
-    warmup_iters = ...
+    with open('./cs336_basics/training/training_loop.yaml', 'r') as f:
+        configs = yaml.safe_load(f)
+    config = configs[args.corpus]
+    # Training configs.
+    num_steps = config.get('num_steps', 100)
+    checkpointing_interval = config.get('checkpointing_interval', 1000)
+    output_file = config['output_file']
+    # Model configs.
+    batch_size = config.get('batch_size', 32)
+    vocab_size = config.get('vocab_size', 10000)
+    context_length = config.get('context_length', 512)
+    d_model = config.get('d_model', 32)
+    num_layers = config.get('num_layers', 8)
+    num_heads = config.get('num_heads', 4)
+    d_ff = config.get('d_ff', 64)
+    rope_theta = config.get('rope_theta', 10000)
+    # Tokenizer configs.
+    vocabs_file = config['vocabs_file']
+    merges_file = config['merges_file']
+    special_tokens = config.get('special_tokens', ['<|endoftext|>'])
+    # Optimizer configs.
+    max_l2_norm = config.get('max_l2_norm', 1.0)
+    max_learning_rate = config.get('max_learning_rate', 1e-4)
+    min_learning_rate = config.get('min_learning_rate', 1e-5)
+    warmup_iters = config.get('warmup_iters', int(num_steps * 0.1))
 
-    #
-    # Data loading.
-    #
-    training_text = ...  # Load from training text file.
+    tokenizer = Tokenizer.from_files(
+        vocabs_file,
+        merges_file,
+        special_tokens,
+    )
 
-    #
-    # Tokenization.
-    #
-    pretokenizer = SpecialTokenAwarePretokenizer(special_tokens)
-    pretokens = pretokenizer.pretokenize(training_text)
-    bpe = BytePairEncoder(pretokens, vocab_size, special_tokens)
-    vocabs, merges = bpe.train()
-    tokenizer = Tokenizer(vocabs, merges, special_tokens)
-    dataset = tokenizer.encode(training_text)
+    # TODO: make pretokenization an iterator to unblock streaming.
+    dataset = tokenizer.encode_iterable(...)
 
     #
     # Training.
@@ -125,4 +128,10 @@ def main():
     )
 
 if __name__ == '__main__':
+    # Commandline args parsing.
+    parser = argparse.ArgumentParser(description='Main training loop.')
+    parser.add_argument('--corpus', type=str, default='tinystories_sample_5M', 
+                        help='training corpus, e.g. tinystories_sample_5M')
+    args = parser.parse_args()
+
     main()
