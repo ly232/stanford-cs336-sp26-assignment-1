@@ -14,6 +14,7 @@ from cs336_basics.data import checkpointing
 from cs336_basics.data import data_loader
 from cs336_basics.model.transformer_lm import TransformerLanguageModel
 from cs336_basics.nn_utils import utils
+from cs336_basics.pretokenization_example import find_chunk_boundaries
 from cs336_basics.training.adamw_optimizer import AdamW
 from cs336_basics.tokenizer.bpe import BytePairEncoder
 from cs336_basics.tokenizer.pretokenizer import SpecialTokenAwarePretokenizer
@@ -32,6 +33,7 @@ def main():
         configs = yaml.safe_load(f)
     config = configs[args.corpus]
     # Training configs.
+    input_file = config['input_file']
     num_steps = config.get('num_steps', 100)
     checkpointing_interval = config.get('checkpointing_interval', 1000)
     output_file = config['output_file']
@@ -60,7 +62,7 @@ def main():
         special_tokens,
     )
 
-    # TODO: make pretokenization an iterator to unblock streaming.
+    # Split files into chunks to process independently.
     dataset = tokenizer.encode_iterable(...)
 
     #

@@ -18,10 +18,9 @@ import multiprocessing
 import os
 import pickle
 
-from cs336_basics.pretokenization_example import find_chunk_boundaries
+from cs336_basics.training.input_file_chunker import split_and_process
 from cs336_basics.tokenizer.bpe_v2 import BytePairEncoder
 from cs336_basics.tokenizer.pretokenizer import SpecialTokenAwarePretokenizer
-from cs336_basics.tokenizer.tokenizer import Tokenizer
 
 import yaml
 
@@ -55,25 +54,24 @@ def generate_pretokens_counter(
     input_file: str,
     special_tokens: list[str],
 ) -> collections.Counter:
-    assert len(special_tokens) == 1, 'Only supports 1 special token.'
+    map_fn = functools.partial(
+        pretokenize_chunk,
+        input_file,
+        special_tokens,
+    )
+    def reduce_fn(child_counters):
+        # Aggregate results from individual chunk's pretoken counters.
+        pretokens_counter = collections.Counter()
+        for counter in child_counters:
+            pretokens_counter += counter
+        return pretokens_counter
+    return split_and_process(
+        input_file=input_file,
+        special_tokens=special_tokens,
+        map_fn=map_fn,
+        reduce_fn=reduce_fn,
+    )
     
-    with open(input_file, 'rb') as f:
-        # Limit to just 4 workers to avoid starving other tasks in OS.
-        num_processes = 2  # os.cpu_count() - 1
-        boundaries = find_chunk_boundaries(
-            f, 10, special_tokens[0].encode())
-
-    with multiprocessing.Pool(num_processes) as pool:
-        # Assign file split indexes from the iterable into the lambda.
-        child_counters = pool.map(
-            functools.partial(pretokenize_chunk, input_file, special_tokens),
-            itertools.pairwise(boundaries))
-    
-    # Aggregate results.
-    pretokens_counter = collections.Counter()
-    for counter in child_counters:
-        pretokens_counter += counter
-    return pretokens_counter
 
 def main():
     # Parse job configs to get hyperparameters.

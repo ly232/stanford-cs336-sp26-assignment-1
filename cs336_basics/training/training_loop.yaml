@@ -1,5 +1,6 @@
 # Configs for the main training loop.
 tinystories_sample_5M:
+  input_file: ./tests/fixtures/tinystories_sample_5M.txt
   vocabs_file: './cs336_basics/training/tinystories_sample_5M_bpe_vocabs.pkl'
   merges_file: './cs336_basics/training/tinystories_sample_5M_bpe_merges.pkl'
   output_file: './cs336_basics/training/tinystories_sample_5M_training_loop_output.bin'

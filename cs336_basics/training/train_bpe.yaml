@@ -7,6 +7,7 @@ tinystories_sample_5M:
   output_bpe_vocabs_file: ./cs336_basics/training/tinystories_sample_5M_bpe_vocabs.pkl
   output_bpe_merges_file: ./cs336_basics/training/tinystories_sample_5M_bpe_merges.pkl
   output_pretokens_counter_file: ./cs336_basics/training/tinystories_sample_5M_pretokens_counter.pkl
+  pretokenize_with_multiprocessing: true
 
 openwebtext_validation:
   input_file: ./owt-sample/owt_valid.txt

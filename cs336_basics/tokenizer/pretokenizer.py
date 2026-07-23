@@ -10,7 +10,7 @@ Example:
   output: ['a_pt1', '<sp1>', 'b_pt1'. 'b_pt2', '<sp2>', 'c_pt1']
 '''
 
-from typing import Iterable
+from typing import Iterable, Iterator
 
 import regex
 
@@ -34,7 +34,7 @@ class SpecialTokenAwarePretokenizer:
         )
         self.pretokenization_regex = pretokenization_regex
 
-    def pretokenize(self, text: Iterable[str]) -> list[str]:
+    def pretokenize(self, text: Iterable[str]) -> Iterator[str]:
         text = ''.join(text)
         def _pretokenize_internal(
                 text: str,
